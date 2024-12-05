@@ -18,8 +18,8 @@
             <ion-card-title>{{ mainan.name }}</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <!-- Directly render steps as plain text without any extra formatting -->
-            <p>{{ mainan.steps }}</p>
+            <!-- Remove numbering from steps -->
+            <p v-html="formattedSteps"></p>
           </ion-card-content>
         </ion-card>
       </ion-content>
@@ -27,26 +27,33 @@
   </template>
   
   <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, computed } from 'vue';
   import { useRoute } from 'vue-router';
   import { firestoreService, type Mainan } from '@/utils/firestore';
-  import { close } from 'ionicons/icons'; // Using close icon for custom back button
+  import { close } from 'ionicons/icons'; 
   
   const route = useRoute();
   const mainan = ref<Mainan | null>(null);
-  
-  // Control the modal open/close state
+    
   const isModalOpen = ref(false);
   
-  // Fetch the recipe data based on the route parameter
   onMounted(async () => {
     const id = route.params.id as string;
     mainan.value = await firestoreService.getMainanById(id);
-    isModalOpen.value = true; // Open the modal when data is loaded
+    isModalOpen.value = true; 
   });
   
-  // Method to close the modal
   const closeModal = () => {
     isModalOpen.value = false;
   };
+  
+  const formattedSteps = computed(() => {
+    if (!mainan.value?.steps) {
+      return '';
+    }
+    return mainan.value.steps
+      .replace(/^\d+\.\s?/gm, '') 
+      .replace(/\n/g, '<br />');   
+  });
   </script>
+  

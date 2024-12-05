@@ -83,26 +83,22 @@
     'submit': [item: Omit<Mainan, 'id' | 'createdAt' | 'updatedAt'>];
   }>();
   
-  // Fungsi untuk membatalkan (close modal)
   const cancel = () => {
     emit('update:isOpen', false);
     emit('update:editingId', null);
     resetMainan();
   };
   
-  // Fungsi untuk submit form tanpa memformat cerita
   const submitForm = () => {
-    emit('submit', { ...props.mainan }); // Kirim cerita seperti yang diinputkan
+    emit('submit', { ...props.mainan }); 
     cancel();
   };
   
-  // Fungsi untuk reset data mainan
   const resetMainan = () => {
     props.mainan.name = '';
     props.mainan.steps = '';
   };
   
-  // Watcher untuk load data jika sedang dalam mode edit
   watch(
     () => props.editingId,
     async (newEditingId) => {
@@ -111,7 +107,7 @@
           const mainan = await firestoreService.getMainanById(newEditingId);
           if (mainan) {
             props.mainan.name = mainan.name;
-            props.mainan.steps = mainan.steps; // Load cerita asli tanpa perubahan
+            props.mainan.steps = mainan.steps; 
           }
         } catch (error) {
           console.error('Failed to fetch mainan data:', error);
