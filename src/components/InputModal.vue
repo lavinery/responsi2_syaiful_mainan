@@ -11,6 +11,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
+        <!-- Input untuk Nama Mainan -->
         <ion-item>
           <ion-input
             v-model="mainan.name"
@@ -19,19 +20,29 @@
             placeholder="Masukkan Nama Mainan"
           ></ion-input>
         </ion-item>
+  
+        <!-- Input untuk Cerita Mainan -->
         <ion-item>
           <ion-textarea
             v-model="mainan.steps"
-            label="Langkah-langkah"
+            label="Cerita Mainan"
             label-placement="floating"
-            placeholder="Masukkan Langkah-langkah Memasak"
+            placeholder="Masukkan Cerita Mainan"
             :autogrow="true"
             :rows="5"
           ></ion-textarea>
         </ion-item>
+  
+        <!-- Tombol Submit -->
         <ion-row>
           <ion-col>
-            <ion-button type="button" @click="submitForm" shape="round" color="primary" expand="block">
+            <ion-button
+              type="button"
+              @click="submitForm"
+              shape="round"
+              color="primary"
+              expand="block"
+            >
               {{ editingId ? 'Edit' : 'Tambah' }} Mainan
             </ion-button>
           </ion-col>
@@ -72,36 +83,26 @@
     'submit': [item: Omit<Mainan, 'id' | 'createdAt' | 'updatedAt'>];
   }>();
   
-  // Function to format the steps after the user submits
-  const formatSteps = () => {
-    if (!props.mainan || !props.mainan.steps) {
-      return '';
-    }
-    
-    // Split the steps by line breaks, map through each step, and add numbering
-    const stepsArray = props.mainan.steps.split('\n').map((step: string, index: number) => `${index + 1}. ${step.trim()}`);
-    return stepsArray.join('\n');
-  };
-  
-  
+  // Fungsi untuk membatalkan (close modal)
   const cancel = () => {
     emit('update:isOpen', false);
     emit('update:editingId', null);
     resetMainan();
   };
   
+  // Fungsi untuk submit form tanpa memformat cerita
   const submitForm = () => {
-    // Format steps only when submitting
-    const formattedSteps = formatSteps();
-    emit('submit', { ...props.mainan, steps: formattedSteps });
+    emit('submit', { ...props.mainan }); // Kirim cerita seperti yang diinputkan
     cancel();
   };
   
+  // Fungsi untuk reset data mainan
   const resetMainan = () => {
     props.mainan.name = '';
     props.mainan.steps = '';
   };
   
+  // Watcher untuk load data jika sedang dalam mode edit
   watch(
     () => props.editingId,
     async (newEditingId) => {
@@ -110,7 +111,7 @@
           const mainan = await firestoreService.getMainanById(newEditingId);
           if (mainan) {
             props.mainan.name = mainan.name;
-            props.mainan.steps = mainan.steps; // Use the saved steps
+            props.mainan.steps = mainan.steps; // Load cerita asli tanpa perubahan
           }
         } catch (error) {
           console.error('Failed to fetch mainan data:', error);
@@ -122,3 +123,4 @@
     { immediate: true }
   );
   </script>
+  
